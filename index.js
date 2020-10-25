@@ -62,11 +62,9 @@ class ServerlessFullstackPlugin {
     }
 
     removeDeployedResources() {
-        let bucketName;
-
+        const bucketName = this.options.bucketName;
         return this.validateConfig()
             .then(() => {
-                bucketName = this.getBucketName(this.options.bucketName);
                 return (this.cliOptions.confirm === false || this.options.noConfirm === true) ? true : new Confirm(`Are you sure you want to delete bucket '${bucketName}'?`).run();
             })
             .then(goOn => {
@@ -172,7 +170,7 @@ class ServerlessFullstackPlugin {
 
                 distributionFolder = this.options.distributionFolder || path.join('client/dist');
                 clientPath = path.join(this.serverless.config.servicePath, distributionFolder);
-                bucketName = this.getBucketName(this.options.bucketName);
+                bucketName = this.options.bucketName;
                 headerSpec = this.options.objectHeaders;
                 indexDoc = this.options.indexDocument || "index.html";
                 errorDoc = this.options.errorDocument || "error.html";
@@ -496,10 +494,9 @@ class ServerlessFullstackPlugin {
         const bucketName = this.getConfig('bucketName', null);
 
         if (bucketName !== null) {
-            const stageBucketName = this.getBucketName(bucketName);
-            this.serverless.cli.log(`Setting up '${stageBucketName}' bucket...`);
-            resources.WebAppS3Bucket.Properties.BucketName = stageBucketName;
-            resources.WebAppS3BucketPolicy.Properties.Bucket = stageBucketName;
+            this.serverless.cli.log(`Setting up '${bucketName}' bucket...`);
+            resources.WebAppS3Bucket.Properties.BucketName = bucketName;
+            resources.WebAppS3BucketPolicy.Properties.Bucket = bucketName;
         } else {
             this.serverless.cli.log(`Setting up '${resources.WebAppS3Bucket.Properties.BucketName}' bucket...`);
         }
@@ -518,11 +515,6 @@ class ServerlessFullstackPlugin {
         const compressWebContent = this.getConfig('compressWebContent', true);
 
         distributionConfig.DefaultCacheBehavior.Compress = compressWebContent;
-    }
-
-    getBucketName(bucketName) {
-        const stageBucketName = `${this.serverless.service.service}-${this.getStage()}-${bucketName}`;
-        return stageBucketName;
     }
 
     getConfig(field, defaultValue) {
