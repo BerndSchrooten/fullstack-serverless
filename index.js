@@ -458,6 +458,14 @@ class ServerlessFullstackPlugin {
                 if (origin.Id === 'WebApp') {
                     delete origin.CustomOriginConfig;
                     origin.OriginPath = this.getConfig('bucketPrefix', '');
+
+                    if (this.getConfig('skipBucketCreation', false)) {
+                        const region =
+                            this.cliOptions.region ||
+                            this.options.region ||
+                            _.get(this.serverless, 'service.provider.region');
+                        origin.DomainName = `${this.getConfig('bucketName')}.s3.${region}.amazonaws.com`;
+                    }
                 }
             }
         } else {
@@ -494,6 +502,12 @@ class ServerlessFullstackPlugin {
     }
 
     prepareS3(resources) {
+        if (this.getConfig('skipBucketCreation', false)) {
+            delete resources.WebAppS3Bucket;
+            delete resources.WebAppS3BucketPolicy;
+            return;
+        }
+
         const bucketName = this.getConfig('bucketName', null);
 
         if (bucketName !== null) {
