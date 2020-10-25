@@ -151,6 +151,7 @@ class ServerlessFullstackPlugin {
             distributionFolder,
             clientPath,
             bucketName,
+            bucketPrefix,
             headerSpec,
             indexDoc,
             errorDoc,
@@ -171,6 +172,7 @@ class ServerlessFullstackPlugin {
                 distributionFolder = this.options.distributionFolder || path.join('client/dist');
                 clientPath = path.join(this.serverless.config.servicePath, distributionFolder);
                 bucketName = this.options.bucketName;
+                bucketPrefix = this.options.bucketPrefix;
                 headerSpec = this.options.objectHeaders;
                 indexDoc = this.options.indexDocument || "index.html";
                 errorDoc = this.options.errorDocument || "error.html";
@@ -447,14 +449,15 @@ class ServerlessFullstackPlugin {
             distributionConfig.DefaultRootObject = indexDocument;
 
             // Remove public read access to bucket, as all access is through the API for single page apps
-            const statements = resources.WebAppS3BucketPolicy.Properties.PolicyDocument.Statement;
-            resources.WebAppS3BucketPolicy.Properties.PolicyDocument.Statement = _.filter(statements, (statement) => {
-                return statement.Sid !== 'AllowPublicRead';
-            });
+            // const statements = resources.WebAppS3BucketPolicy.Properties.PolicyDocument.Statement;
+            // resources.WebAppS3BucketPolicy.Properties.PolicyDocument.Statement = _.filter(statements, (statement) => {
+            //     return statement.Sid !== 'AllowPublicRead';
+            // });
 
             for (let origin of distributionConfig.Origins) {
                 if (origin.Id === 'WebApp') {
                     delete origin.CustomOriginConfig;
+                    origin.OriginPath = this.getConfig('bucketPrefix', '');
                 }
             }
         } else {
