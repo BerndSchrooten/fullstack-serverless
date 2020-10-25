@@ -63,6 +63,7 @@ class ServerlessFullstackPlugin {
 
     removeDeployedResources() {
         const bucketName = this.options.bucketName;
+        const bucketPrefix = this.options.bucketPrefix;
         return this.validateConfig()
             .then(() => {
                 return (this.cliOptions.confirm === false || this.options.noConfirm === true) ? true : new Confirm(`Are you sure you want to delete bucket '${bucketName}'?`).run();
@@ -74,7 +75,7 @@ class ServerlessFullstackPlugin {
                         if (exists) {
                             this.serverless.cli.log(`Deleting all objects from bucket...`);
                             return bucketUtils
-                                .emptyBucket(this.aws, bucketName)
+                                .emptyBucket(this.aws, bucketName, bucketPrefix)
                                 .then(() => {
                                     this.serverless.cli.log(
                                         `Success! Your client files have been removed`
@@ -219,7 +220,7 @@ class ServerlessFullstackPlugin {
                         })
                         .then(() => {
                             this.serverless.cli.log(`Uploading client files to bucket...`);
-                            return uploadDirectory(this.aws, bucketName, clientPath, headerSpec);
+                            return uploadDirectory(this.aws, bucketName, bucketPrefix, clientPath, headerSpec);
                         })
                         .then(() => {
                             this.serverless.cli.log(
