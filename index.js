@@ -73,7 +73,7 @@ class ServerlessFullstackPlugin {
                     this.serverless.cli.log(`Looking for bucket '${bucketName}'...`);
                     return bucketUtils.bucketExists(this.aws, bucketName).then(exists => {
                         if (exists) {
-                            this.serverless.cli.log(`Deleting all objects from bucket...`);
+                            this.serverless.cli.log(`Deleting all objects from bucket with prefix ${bucketPrefix}...`);
                             return bucketUtils
                                 .emptyBucket(this.aws, bucketName, bucketPrefix)
                                 .then(() => {
