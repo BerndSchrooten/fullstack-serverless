@@ -211,8 +211,8 @@ class ServerlessFullstackPlugin {
                                     return BbPromise.resolve();
                                 }
 
-                                this.serverless.cli.log(`Deleting all objects from bucket...`);
-                                return bucketUtils.emptyBucket(this.aws, bucketName);
+                                this.serverless.cli.log(`Deleting all objects from bucket with prefix ${bucketPrefix}...`);
+                                return bucketUtils.emptyBucket(this.aws, bucketName, bucketPrefix);
                             } else {
                                 this.serverless.cli.log(`Bucket does not exist. Run ${chalk.black('serverless deploy')}`);
                                 return BbPromise.reject('Bucket does not exist!');
